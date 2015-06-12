@@ -75,16 +75,19 @@ module Devise
 
 
       def token_is_current?(token, client_id)
+        # ghetto HashWithIndifferentAccess
+        expiry     = self.tokens[client_id]['expiry'] || self.tokens[client_id][:expiry]
+        token_hash = self.tokens[client_id]['token'] || self.tokens[client_id][:token]
+
         return true if (
           # ensure that expiry and token are set
-          self.tokens[client_id]['expiry'] and
-          self.tokens[client_id]['token'] and
+          expiry and token and
 
-          # ensure that the token was created within the last two weeks
-          DateTime.strptime(self.tokens[client_id]['expiry'].to_s, '%s') > Time.now and
+          # ensure that the token has not yet expired
+          DateTime.strptime(expiry.to_s, '%s') > Time.now and
 
           # ensure that the token is valid
-          BCrypt::Password.new(self.tokens[client_id]['token']) == token
+          BCrypt::Password.new(token_hash) == token
         )
       end
 

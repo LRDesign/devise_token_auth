@@ -43,7 +43,6 @@ class UserTest < ActiveSupport::TestCase
         @user = users(:confirmed_email_user)
         @user.skip_confirmation!
         @user.save!
-
         @auth_headers = @user.create_new_auth_token
 
         @token     = @auth_headers['access-token']
@@ -70,7 +69,7 @@ class UserTest < ActiveSupport::TestCase
       end
 
       test 'expired token was removed' do
-        refute @user.tokens[@old_auth_headers['client']]
+        refute @user.tokens[@old_auth_headers[:client]]
       end
 
       test 'current token was not removed' do
